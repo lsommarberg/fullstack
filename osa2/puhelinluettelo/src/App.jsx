@@ -143,7 +143,7 @@ const App = () => {
           })
           .catch(error => {
             setErrorMessage(
-              `Information of ${person.name} was already removed from server`        
+              error.response.data.error      
               )        
               setTimeout(() => {          
                 setErrorMessage(null)        
@@ -163,14 +163,22 @@ const App = () => {
       .create(nameObject)  
       .then(returnedPerson => {      
         setPersons(persons.concat(returnedPerson))
+        setAddMessage(`Added ${newName}`)
+        setTimeout(() => {
+          setAddMessage(null);
+        }, 5000)
         setNewName('') 
         setNewNumber('')  
       })
-    setAddMessage(`Added ${newName}`)
-      setTimeout(() => {          
-        setAddMessage(null)        
-      }, 5000)
-    
+      .catch(error => {
+        setErrorMessage(
+          error.response.data.error
+          )        
+          setTimeout(() => {          
+            setErrorMessage(null)        
+          }, 5000) 
+      })
+  
     }
   }
   const handleNameChange = (event) => {
