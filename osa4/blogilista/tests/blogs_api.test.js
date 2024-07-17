@@ -189,7 +189,6 @@ describe.only('Routes for blogs', () => {
     const passwordHash = await bcrypt.hash('sekret', 10)
     const user = new User({ username: 'username', passwordHash })
     const savedUser = await user.save()
-    console.log('Saved User:', savedUser);
     userId = savedUser._id
 
     const userForToken = {
@@ -208,7 +207,6 @@ describe.only('Routes for blogs', () => {
       let blogObject = new Blog(blog)
       blogObject.user = userId
       await blogObject.save()
-      console.log('Saved Blog:', blogObject)
     }
   })
 
@@ -313,7 +311,7 @@ describe.only('Routes for blogs', () => {
 
   })
 
-  test.only('the error is handled if there is no url', async () => {
+  test('the error is handled if there is no url', async () => {
     const newBlog = {
       _id: "5a422ba71b54a676234d17fb",
       title: "TDD harms architecture",
@@ -344,7 +342,7 @@ describe.only('Routes for blogs', () => {
 
   })
 
-  test.only('the blog can be modified with put', async () => {
+  test('the blog can be modified with put', async () => {
     const modifiedBlog = {
       _id: "5a422aa71b54a676234d17f8",
       title: "Go To Statement Considered Harmful",
@@ -369,6 +367,27 @@ describe.only('Routes for blogs', () => {
     const likes = response.body.map(r => r.likes)
 
     assert(likes.includes(6))
+  })
+  
+
+  test.only('the blog can not be added without authorization', async () => {
+    const newBlog = {
+      _id: "5a422ba71b54a676234d17fb",
+      title: "Go To Statement Considered Harmful",
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+      likes: 0,
+      __v: 0,
+      user: userId
+
+    }
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+    assert.strictEqual(response.body.error, 'token missing')
+
+
   })
 })
 after(async () => {
