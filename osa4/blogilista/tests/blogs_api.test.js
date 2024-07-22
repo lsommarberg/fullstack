@@ -358,7 +358,7 @@ describe.only('Routes for blogs', () => {
       .set('Authorization', `Bearer ${token}`)
 
       .send(modifiedBlog)
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')

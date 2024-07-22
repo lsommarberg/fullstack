@@ -37,11 +37,12 @@ blogsRouter.post('/', userExtractor, async (request, response, next) => {
   }
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id', userExtractor, async (request, response, next) => {
  try {
   const user = request.user
   const userid = user.id
   const blog = await Blog.findById(request.params.id)
+
   if (!user || !blog) {
     response.status(404).json({ error: 'Blog or associated user not found'  })
   }
@@ -55,23 +56,27 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {
+
   const body = request.body
+
   const blog = {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    user: body.user._id
   }
-  
+
   try {
-    const result = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    response.status(201).json(result)
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      response.status(400).json({ error: error.message });
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true }).populate('user', { username: 1, name: 1 })
+  
+    if (updatedBlog) {
+      response.status(200).json(updatedBlog)
     } else {
-      next(error)
+      response.status(404).json({ error: 'Blog not found' })
     }
+  } catch (error) {
+    next(error)
   }
 })
 
