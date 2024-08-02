@@ -1,20 +1,32 @@
 import React from 'react';
-import { updateBlog } from '../reducers/blogReducer';
+import { deleteBlog, updateBlog } from '../reducers/blogReducer';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
 
-const Blog = ({
-  blog,
-  visible,
-  toggleVisibility,
-  handleLike,
-  handleDelete,
-  user,
-}) => {
+const Blog = ({ blog, user }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
+  };
+  const dispatch = useDispatch();
+
+  const [visible, setVisible] = useState(false);
+
+  const toggleBlogVisibility = () => {
+    setVisible(!visible);
+  };
+
+  const handleLike = async () => {
+    dispatch(updateBlog(blog.id));
+  };
+
+  const handleDelete = () => {
+    if (window.confirm(`Delete ${blog.title}?`)) {
+      dispatch(deleteBlog(blog.id));
+    }
   };
 
   return (
@@ -24,7 +36,7 @@ const Blog = ({
           {' '}
           {blog.title} {blog.author}{' '}
         </span>
-        <button onClick={toggleVisibility} name="view">
+        <button onClick={toggleBlogVisibility} name="view">
           {visible ? 'hide' : 'view'}
         </button>
       </li>
